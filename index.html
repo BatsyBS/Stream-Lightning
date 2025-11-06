@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stream Lightning - Live Streaming Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            font-size: 3em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .logo-icon {
+            font-size: 4em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .options {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .option-card {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            color: white;
+        }
+
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .option-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .option-card p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .option-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .features {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .features h3 {
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .features ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .features li {
+            color: #666;
+            padding: 8px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+
+        .features li:before {
+            content: "⚡ ";
+        }
+
+        #streamForm, #watchForm {
+            display: none;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .options {
+                flex-direction: column;
+            }
+
+            .features ul {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <div class="logo-icon">⚡</div>
+            <h1>STREAM LIGHTNING</h1>
+        </div>
+        <p class="subtitle">Ultra-Low Latency Live Streaming Platform</p>
+
+        <div id="homeView">
+            <div class="options">
+                <div class="option-card" onclick="showStreamForm()">
+                    <div class="option-icon">📡</div>
+                    <h3>Start Stream</h3>
+                    <p>Share your screen with viewers</p>
+                </div>
+                <div class="option-card" onclick="showWatchForm()">
+                    <div class="option-icon">👀</div>
+                    <h3>Watch Stream</h3>
+                    <p>Join an existing stream</p>
+                </div>
+            </div>
+
+            <div class="features">
+                <h3>✨ Key Features</h3>
+                <ul>
+                    <li>Screen Sharing</li>
+                    <li>Real-time Chat</li>
+                    <li>Latency Monitor</li>
+                    <li>20+ Viewers</li>
+                    <li>WebRTC Technology</li>
+                    <li>Browser Compatible</li>
+                    <li>Low Latency</li>
+                    <li>HD Quality</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="streamForm">
+            <button class="btn back-btn" onclick="showHome()">← Back</button>
+            <h2 style="color: #333; margin-bottom: 20px;">Start Your Stream</h2>
+            <form onsubmit="startStream(event)">
+                <div class="form-group">
+                    <label for="streamRoom">Room Name</label>
+                    <input type="text" id="streamRoom" placeholder="Enter unique room name" required>
+                </div>
+                <div class="form-group">
+                    <label for="streamerName">Your Name</label>
+                    <input type="text" id="streamerName" placeholder="Enter your name" required>
+                </div>
+                <button type="submit" class="btn">🚀 Start Streaming</button>
+            </form>
+        </div>
+
+        <div id="watchForm">
+            <button class="btn back-btn" onclick="showHome()">← Back</button>
+            <h2 style="color: #333; margin-bottom: 20px;">Join a Stream</h2>
+            <form onsubmit="joinStream(event)">
+                <div class="form-group">
+                    <label for="watchRoom">Room Name</label>
+                    <input type="text" id="watchRoom" placeholder="Enter room name" required>
+                </div>
+                <div class="form-group">
+                    <label for="viewerName">Your Name</label>
+                    <input type="text" id="viewerName" placeholder="Enter your name" required>
+                </div>
+                <button type="submit" class="btn">🎬 Join Stream</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showStreamForm() {
+            document.getElementById('homeView').style.display = 'none';
+            document.getElementById('streamForm').style.display = 'block';
+            document.getElementById('watchForm').style.display = 'none';
+        }
+
+        function showWatchForm() {
+            document.getElementById('homeView').style.display = 'none';
+            document.getElementById('streamForm').style.display = 'none';
+            document.getElementById('watchForm').style.display = 'block';
+        }
+
+        function showHome() {
+            document.getElementById('homeView').style.display = 'block';
+            document.getElementById('streamForm').style.display = 'none';
+            document.getElementById('watchForm').style.display = 'none';
+        }
+
+        function startStream(event) {
+            event.preventDefault();
+            const roomName = document.getElementById('streamRoom').value;
+            const streamerName = document.getElementById('streamerName').value;
+            window.location.href = `/stream/${roomName}?name=${encodeURIComponent(streamerName)}`;
+        }
+
+        function joinStream(event) {
+            event.preventDefault();
+            const roomName = document.getElementById('watchRoom').value;
+            const viewerName = document.getElementById('viewerName').value;
+            window.location.href = `/watch/${roomName}?name=${encodeURIComponent(viewerName)}`;
+        }
+    </script>
+</body>
+</html>

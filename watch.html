@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stream Lightning - Viewer</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .room-info {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            opacity: 0.8;
+        }
+
+        .main-content {
+            display: flex;
+            height: calc(100vh - 70px);
+        }
+
+        .video-section {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .video-container {
+            flex: 1;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px 20px;
+            border-radius: 10px;
+        }
+
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+
+        .live-dot {
+            width: 12px;
+            height: 12px;
+            background: #ff0000;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .placeholder {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .placeholder-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary {
+            background: #607d8b;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar {
+            width: 350px;
+            background: #16213e;
+            display: flex;
+            flex-direction: column;
+            border-left: 2px solid #0f3460;
+        }
+
+        .sidebar-tabs {
+            display: flex;
+            background: #0f3460;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: #16213e;
+            border-bottom-color: #667eea;
+        }
+
+        .tab:hover {
+            background: #1a2942;
+        }
+
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .chat-messages {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .message {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        .message-user {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .message-time {
+            font-size: 0.8em;
+            opacity: 0.6;
+            margin-left: 10px;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #0f3460;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1em;
+        }
+
+        .chat-input input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .chat-input button {
+            padding: 10px 20px;
+            background: #667eea;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .latency-display {
+            font-size: 2em;
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .latency-label {
+            font-size: 0.5em;
+            opacity: 0.7;
+            margin-bottom: 10px;
+        }
+
+        .latency-good { color: #4caf50; }
+        .latency-medium { color: #ff9800; }
+        .latency-bad { color: #f44336; }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 300px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <div class="logo">⚡ STREAM LIGHTNING</div>
+            <div class="room-info">
+                <div>Room: <strong id="roomName"></strong></div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="viewerCount">0</div>
+                    <div class="stat-label">Viewers</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="latencyDisplay">--</div>
+                    <div class="stat-label">Latency (ms)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="video-section">
+            <div class="video-container">
+                <video id="remoteVideo" autoplay playsinline></video>
+                <div class="video-overlay">
+                    <div class="live-indicator">
+                        <span class="live-dot"></span>
+                        <span id="streamStatus">CONNECTING...</span>
+                    </div>
+                </div>
+                <div id="waitingMessage" class="placeholder">
+                    <div class="placeholder-icon">📺</div>
+                    <h2>Waiting for stream...</h2>
+                    <p>The broadcaster will start streaming shortly</p>
+                </div>
+            </div>
+            <div class="controls">
+                <button class="btn btn-secondary" onclick="window.location.href='/'">
+                    🏠 Home
+                </button>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="sidebar-tabs">
+                <div class="tab active" onclick="switchTab('chat')">💬 Chat</div>
+                <div class="tab" onclick="switchTab('stats')">📊 Stats</div>
+            </div>
+            <div class="tab-content">
+                <div id="chatTab" class="tab-pane">
+                    <div class="chat-messages" id="chatMessages"></div>
+                    <div class="chat-input">
+                        <input type="text" id="chatInput" placeholder="Type a message..." onkeypress="handleChatKeypress(event)">
+                        <button onclick="sendMessage()">Send</button>
+                    </div>
+                </div>
+                <div id="statsTab" class="tab-pane" style="display: none;">
+                    <div class="latency-display" id="latencyBig">
+                        <div class="latency-label">Current Latency</div>
+                        <span id="avgLatency">-- ms</span>
+                    </div>
+                    <div style="padding: 15px; background: rgba(255, 255, 255, 0.1); border-radius: 8px;">
+                        <div style="margin-bottom: 10px;"><strong>Connection Info:</strong></div>
+                        <div id="connectionInfo" style="font-size: 0.9em; line-height: 1.6;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/viewer.js"></script>
+</body>
+</html>
